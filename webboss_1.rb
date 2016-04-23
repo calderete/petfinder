@@ -3,17 +3,33 @@ require "Nokogiri"
 require "HTTParty"
 require "csv"
 require "JSON"
+require "awesome_print"
 
 class GetListings
 
 	def initialize
-		puts "Which city do you wish to search?"
+		ap "Which city do you wish to search?"
 		city = gets.chomp.downcase
-		get_listings(city)
+		ap"Type the 3 letter code of the catagory you wish to search?"
+		ap"all: ccc"
+		ap"artists: ats"
+		ap"activity partners: act"
+		ap"childcare: kid"
+		ap"general: com"
+		ap"groups: grp"
+		ap"local news and views: vnn"
+		ap"lost and found: laf"
+		ap "musicians: muc"
+		ap"pets: pet"
+		ap"politics: pol"
+		ap"rideshare: rid"
+		ap"volunteers: vol"
+		catagory = gets.chomp.downcase
+		get_listings(city, catagory)
 	end
 
-	def get_listings(city)
-		page = HTTParty.get("https://#{city}.craigslist.org/search/pet?s=0")
+	def get_listings(city, catagory)
+		page = HTTParty.get("https://#{city}.craigslist.org/search/#{catagory}?s=0")
 		parse_page = Nokogiri::HTML(page)
 		pets_array = []
 		parse_page.css('.content').css('.row').css('.hdrlnk').map do |a|
@@ -26,10 +42,10 @@ end
 
 class CreateFile
 	def push_to_file(pets_array)
-		puts "What would you like to name this search?"
+		ap "What would you like to name this search?"
 		name = gets.chomp
 		date = DateTime.now
-		file_name = "pet_search_#{name}_#{date}.csv"
+		file_name = "search_#{name}_#{date}.csv"
 		CSV.new("#{file_name}")
 		CSV.open("#{file_name}", "w") do |csv|
 			csv << pets_array
@@ -39,22 +55,19 @@ class CreateFile
 end
 
 class DisplayResults
-
 	def display(file_name)
-		puts "Would you like to view the listings in the terminal? y/n"
+		ap "Would you like to view the listings in the terminal? y/n"
 		if gets.chomp.downcase == "y"
 			file = CSV.open("#{file_name}", "r")
 			file.each do |line|
-				puts line
+				ap line
 			end
 		else
-			puts "Goodbye"
+			ap "Goodbye"
 			exit
 		end
 	end
 end
-
-
 GetListings.new
 
 
