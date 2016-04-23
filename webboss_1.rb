@@ -19,7 +19,7 @@ class GetListings
 		ap"groups: grp"
 		ap"local news and views: vnn"
 		ap"lost and found: laf"
-		ap "musicians: muc"
+		ap"musicians: muc"
 		ap"pets: pet"
 		ap"politics: pol"
 		ap"rideshare: rid"
@@ -31,24 +31,24 @@ class GetListings
 	def get_listings(city, catagory)
 		page = HTTParty.get("https://#{city}.craigslist.org/search/#{catagory}?s=0")
 		parse_page = Nokogiri::HTML(page)
-		pets_array = []
+		listing_array = []
 		parse_page.css('.content').css('.row').css('.hdrlnk').map do |a|
 			post_name = a.text
-			pets_array.push(post_name)
+			listing_array.push(post_name)
 		end
-		 CreateFile.new.push_to_file(pets_array)
+		 CreateFile.new.push_to_file(listing_array)
 	end
 end
 
 class CreateFile
-	def push_to_file(pets_array)
+	def push_to_file(listing_array)
 		ap "What would you like to name this search?"
 		name = gets.chomp
 		date = DateTime.now
 		file_name = "search_#{name}_#{date}.csv"
 		CSV.new("#{file_name}")
 		CSV.open("#{file_name}", "w") do |csv|
-			csv << pets_array
+			csv << listing_array
 		end
 		DisplayResults.new.display(file_name)
 	end
