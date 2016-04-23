@@ -29,16 +29,33 @@ class CreateFile
 		puts "What would you like to name this search?"
 		name = gets.chomp
 		date = DateTime.now
-		CSV.new("pet_search_#{name}_#{date}.csv")
-		CSV.open("pet_search_#{name}_#{date}.csv", "w") do |csv|
+		file_name = "pet_search_#{name}_#{date}.csv"
+		CSV.new("#{file_name}")
+		CSV.open("#{file_name}", "w") do |csv|
 			csv << pets_array
+		end
+		DisplayResults.new.display(file_name)
+	end
+end
+
+class DisplayResults
+
+	def display(file_name)
+		puts "Would you like to view the listings in the terminal? y/n"
+		if gets.chomp.downcase == "y"
+			file = CSV.open("#{file_name}", "r")
+			file.each do |line|
+				puts line
+			end
+		else
+			puts "Goodbye"
+			exit
 		end
 	end
 end
 
-run = GetListings.new
-run
-#Pry.start(binding)
+
+GetListings.new
 
 
 
